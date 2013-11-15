@@ -3,6 +3,7 @@
 // @namespace   JavaBaker
 // @version     1
 // @grant       none
+// test
 // ==/UserScript==
 $("pre").click( function(event)
 {

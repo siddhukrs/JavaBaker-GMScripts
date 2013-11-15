@@ -2,6 +2,7 @@
 // @name        JavaBaker - StackOverflow
 // @namespace   JavaBaker
 // @version     1
+// test
 // @grant       none
 // ==/UserScript==
 $("code").click( function(event)
