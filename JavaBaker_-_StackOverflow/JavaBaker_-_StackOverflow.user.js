@@ -2,6 +2,9 @@
 // @name        JavaBaker - StackOverflow
 // @namespace   JavaBaker
 // @version     1
+// @include http://stackoverflow.com/*
+// @include https://stackoverflow.com/*
+// @include stackoverflow.com/*
 // test
 // @grant       none
 // ==/UserScript==

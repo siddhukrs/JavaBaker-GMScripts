@@ -2,6 +2,9 @@
 // @name        JavaBaker - GitHub
 // @namespace   JavaBaker
 // @version     1
+// @include http://github.com/*
+// @include https://github.com/*
+// @include github.com/*
 // @grant       none
 // test
 // ==/UserScript==
@@ -10,11 +13,11 @@ $("pre").click( function(event)
    var code = "";
    var codeLines = document.getElementsByClassName("line");
    var arr = Array.prototype.slice.call( codeLines );
-  
    for(var i = 0; i < arr.length; i++)
    {
         code = code + $(arr[i]).text() + "\n";
    }
+   alert(codeLines);
    code = encodeURIComponent(code);
    var url = ""+code;
    var form = document.createElement("form");
