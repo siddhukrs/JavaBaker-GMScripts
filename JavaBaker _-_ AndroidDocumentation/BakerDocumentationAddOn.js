@@ -40,14 +40,16 @@ className = className.substring(1);
 var getDistinctTableString = function(response) {
     var json = JSON.parse(response.responseText),
         table = "<table><tr><th>#</th><th>Title</th><th>Date</th></tr>",
-        stack = [];
+        stack = [],
+        index = 0;
     for(i =0; i<json.length; i++)
     {
         var temp = json[i];
         if($.inArray(temp.title, stack) === -1)
         {
+            index++;
             stack[stack.length] = temp.title;
-            table = table + "<tr><td>" + temp.index + "</td><td><a href = " + temp.url + ">" + temp.title + "</a></td><td>" + temp.date + "</td></tr>";
+            table = table + "<tr><td>" + index + "</td><td><a href = " + temp.url + ">" + temp.title + "</a></td><td>" + temp.date + "</td></tr>";
         }
     }
     table = table + "</table>";
@@ -57,7 +59,7 @@ var getDistinctTableString = function(response) {
 var updatePage = function(response){
     var table = getDistinctTableString(response);
     $( ".jd-descr" ).first().before(
-        '<div class="stackoverflowExamples"><h2><img id="stackOverflowLogo" src="http://files.quickmediasolutions.com/so-images/stackoverflow.svg"> Examples for '+ className +' <hr></h2>' + table +  '</div>'
+        '<div class="stackoverflowExamples"><h2><img id="stackOverflowLogo" src="http://files.quickmediasolutions.com/so-images/stackoverflow.svg"> Code Examples for '+ className +' <hr></h2>' + table +  '</div>'
     );
     $("#stackOverflowLogo").css ({
         width:      "30px",
