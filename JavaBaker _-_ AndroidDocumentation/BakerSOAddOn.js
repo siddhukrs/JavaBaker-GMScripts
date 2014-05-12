@@ -51,16 +51,41 @@ function getShortClass(element)
     return shortName;
 }
 
+function loaded(response)
+{
+    console.log(response);
+}
+
 function getPostCountClass(element)
 {
     var base = baseBakerCount;
+    var count = "0";
     base = base + "?type=apitype&name=" + element + "&precision=1";
-    GM_xmlhttpRequest({
+    /*GM_xmlhttpRequest({
     method: "GET",
     url: base,
-    onload: updatePage
-});
+    synchronous : true,
+    onload: function (response) {
+        alert(response.responseText);
+        count = response.responseText;}
+    });*/
+    return count;
+}
 
+function getPostCountMethod(element)
+{
+    var base = baseBakerCount;
+    var count = "0";
+    base = base + "?type=method&name=" + element + "&precision=1";
+    /*GM_xmlhttpRequest({
+    method: "GET",
+    url: base,
+    synchronous : true,
+    onload: function (response) {
+        alert(response.responseText);
+        count = response.responseText;}
+    });*/
+    return count;
 }
 
 function getUrlMethod(element)
@@ -143,7 +168,8 @@ function updatePage(response)
     for(var i=0; i < arr.length; i++)
     {
         var lineno = i+1;
-        var titleString = "One line " + lineno + ": \n";
+        var titleString = "";
+        //titleString = titleString + "One line " + lineno + ": \n";
         if(map2.hasOwnProperty(i+count))
         {
 
@@ -156,35 +182,39 @@ function updatePage(response)
             var values = map2[i+count]["class"];
             if(values.length >0)
             {
-                titleString = titleString + "<h1>Classes: </h1>"
+                //titleString = titleString + "<h3>Classes: </h3>"
             }
-            titleString = titleString + "<table>";
+            
+           
             for(var j=0; j<values.length; j++)
             {
-                titleString = titleString + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlClass(values[j]) + "\">" + values[j] + "</a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
-                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsClass(values[j]) + "\">Stack Overflow posts(" + getPostCountClass(element) + ")</a> involving " + getShortClass(values[j]) +  " </td></tr>";
+                titleString = titleString + "<h3 align = 'left'>" + values[j] + "</h3>"
+                titleString = titleString + "<table>";
+                titleString = titleString + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlClass(values[j]) + "\"><u>Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
+                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsClass(values[j]) + "\"><u>Stack Overflow posts(" + getPostCountClass(values[j]) + ")</u></a> involving " + getShortClass(values[j]) +  " </td></tr>";
+                titleString = titleString + "</table><br>";
             }
-            titleString = titleString + "</table>";
+
             var values = map2[i+count]["method"];
-            if(values.lengt
-                h >0)
+            if(values.length >0)
             {
-                titleString = titleString + "<h1>Methods: </h1>"
+                //titleString = titleString + "<h3>Methods: </h3>"
             }
-            titleString = titleString + "<table>";
+
             for(var j=0; j<values.length; j++)
             {
-                titleString = titleString + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlClass(values[j]) + "\">" + values[j] + "</a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
-                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsMethod(values[j]) + "\">Stack Overflow posts(" + getPostCountMethod(element) + ")</a> involving " + getShortMethod(values[j]) +  " </td></tr>";
+                titleString = titleString + "<h3 align = 'left'>" + values[j] + "</h3>"
+                titleString = titleString + "<table>";
+                titleString = titleString + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlMethod(values[j]) + "\"><u> Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
+                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsMethod(values[j]) + "\"><u>Stack Overflow posts(" + getPostCountMethod(values[j]) + ")</u></a> involving " + getShortMethod(values[j]) +  " </td></tr>";
+                titleString = titleString + "</table><br>";
             }
-            titleString = titleString + "</table>";
             titleString = titleString + "<script> $(\".androidLogo\").css ({width: \"20px\", height: \"20px\"});\n $(\".SOLogo\").css ({width: \"20px\", height: \"20px\"});$(\".gitLogo\").css ({width: \"20px\", height: \"20px\"});</script>";
         }
         contentMap[lineno] = titleString;
         newCode = newCode + "<span class = \"ttip\" title = \""+ lineno +"\">" + arr[i] + "</span>\n"
     }
 
-    alert(newCode);
     $(".answer.accepted-answer").find(".post-text").find("code").html(newCode);
     
     var newCSS = GM_getResourceText ("customCSS");
@@ -192,7 +222,17 @@ function updatePage(response)
     
 
 
-    $(".ttip").tooltip({
+    $(".ttip").on('mouseenter',
+        function(e)
+        {
+            $('.ttip').not($(this)).tooltip('close');   // Close all other tooltips
+
+        }).on('mouseleave',
+        function(e)
+        {
+            e.stopImmediatePropagation();    // keeps tooltip visible when hovering tooltip itself
+
+        }).tooltip({
         content: function() {
             var titleText = contentMap[$(this).attr("title")];
             return titleText;
@@ -202,11 +242,14 @@ function updatePage(response)
             at: "top"
         },
         html: true,
+        delay : 1000,
         open: function (event, ui) {
             ui.tooltip.css("max-width", "800px");
         }
     });
 }
+
+
 
 var contentMap = {};
 var baseBaker = "http://gadget.cs.uwaterloo.ca:2145/snippet/getanswers.php";
@@ -222,5 +265,3 @@ GM_xmlhttpRequest({
     url: "http://gadget.cs.uwaterloo.ca:2145/snippet/BakerMapApiInCode.php?aid=" + answerId + "&code=" + code,
     onload: updatePage
 });
-
-var codeCss = getCodeCss();
