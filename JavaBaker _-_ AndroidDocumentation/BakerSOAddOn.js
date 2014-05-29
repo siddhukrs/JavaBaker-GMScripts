@@ -215,7 +215,7 @@ function updatePage(response)
         newCode = newCode + "<span class = \"ttip\" title = \""+ lineno +"\">" + arr[i] + "</span>\n"
     }
 
-    $(".answer.accepted-answer").find(".post-text").find("code").html(newCode);
+    $(".answer.accepted-answer").find(".post-text").find("code").first().html(newCode);
     
     var newCSS = GM_getResourceText ("customCSS");
     GM_addStyle(newCSS);
