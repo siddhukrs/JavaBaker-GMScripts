@@ -39,7 +39,7 @@ className = className.substring(1);
 
 var getDistinctTableString = function(response) {
     var json = JSON.parse(response.responseText),
-        table = "<table><tr><th>#</th><th>Title</th><th>Snippet Index in Accepted Answer</th><th>Line No.</th><th>Date</th></tr>",
+        table = "<div class='scrollit'><table><tr><th>#</th><th>Title</th><th>Snippet Index in Accepted Answer</th><th>Line No.</th><th>Date</th></tr>",
         stack = [],
         index = 0;
     for(i =0; i<json.length; i++)
@@ -52,7 +52,7 @@ var getDistinctTableString = function(response) {
             table = table + "<tr><td>" + index + "</td><td><a href = " + temp.url + ">" + temp.title + "</a></td><td>" + temp.codeid + "</td><td>" + temp.line + "</td><td>" + temp.date + "</td></tr>";
         }
     }
-    table = table + "</table>";
+    table = table + "</table></div>";
     return table;
 };
 
@@ -65,6 +65,8 @@ var updatePage = function(response){
         width:      "30px",
         height:     "30px",
     });
+         
+
 };
 
 GM_xmlhttpRequest({
