@@ -8,6 +8,7 @@
 // @require     http://code.jquery.com/jquery-1.9.1.js
 // @require     http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource    customCSS   http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css
+// @updateURL http://gadget.cs.uwaterloo.ca:2145/snippet/GreasemonkeyScripts/BakerSOAddon.js
 // ==/UserScript==
 
 
@@ -31,7 +32,7 @@ function getCodeBlockText()
 
 function getUrlClass(element)
 {
-    var base = androidBaseUrl;
+   /* var base = androidBaseUrl;
     var arr = element.split(".");
     for(var i = 0; i<arr.length; i++)
     {
@@ -40,7 +41,15 @@ function getUrlClass(element)
         base = base + token + '/';
     }
     base = base.substring(0, base.length - 1) + ".html";
-    return base;
+    return base;*/
+
+    if(urlListing[element])
+    {
+        return urlListing[element];
+    }
+
+    else
+        return "";
 }
 
 function getShortClass(element)
@@ -90,17 +99,24 @@ function getPostCountMethod(element)
 
 function getUrlMethod(element)
 {
-    var base = androidBaseUrl;
+    var classn = "";
     var arr = element.split(".");
+    var flag = 0;
     for(var i = 0; i<arr.length-1; i++)
     {
+        if(flag == 1)
+            break;
         var token = arr[i];
-        token = token.replace('$', '.');
-        base = base + token + '/';
+        if(token.indexOf('$') !== -1)
+        {
+            var splitDollar = toke.split('$');
+            token = splitDollar[0];
+            flag = 1;
+        }
+        classn = classn + token + '.';
     }
-    base = base.substring(0, base.length - 1) + ".html";
-    base = base + '#' + arr[arr.length-1];
-    return base;
+
+    return (urlListing[classn.substr(0,classn.length-1)] + "#" + arr[arr.length-1]);
 }
 
 function getShortMethod(element)
@@ -127,6 +143,7 @@ function getOtherSOPostsMethod(element)
 
 function updatePage(response)
 {
+    alert(response.responseText);
     var map2 = {},
         json = JSON.parse(response.responseText),
         cutype = 0;
@@ -138,6 +155,7 @@ function updatePage(response)
             if(row.apitype == "class")
             {
                 map2[row.line].class.push(row.element);
+                urlListing[row.element] = decodeURI(row.url);
             }
             else
             {
@@ -153,6 +171,7 @@ function updatePage(response)
             if(row.apitype == "class")
             {
                 map2[row.line].class.push(row.element);
+                urlListing[row.element] = decodeURI(row.url);
             }
             else
             {
@@ -160,7 +179,7 @@ function updatePage(response)
             }
         }
     }
-    
+
 
     var count = cutype + 1;
     var arr = code.split('\n');
@@ -173,25 +192,22 @@ function updatePage(response)
         if(map2.hasOwnProperty(i+count))
         {
 
-            /*text = text + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><u> Javadoc </u></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
+            /*text = text + "<tr><td><img class = \"javaLogo\" src=\"" + javaImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><u> Javadoc </u></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
             text = text + "<tr><td><img class = \"gitLogo\"  src=\"" + ghImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><u> Source Code </u></td><td>&nbsp;&nbsp;</td><td align = 'left'>[github.com]</td></tr></table>";
             text = text + "<table><tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td align = 'left'><u>StackOverflow posts (18)</u> involving Chronometer </td></tr></table>";
-            text = text + "<script> $(\".androidLogo\").css ({width: \"20px\", height: \"20px\"});\n $(\".SOLogo\").css ({width: \"20px\", height: \"20px\"});$(\".gitLogo\").css ({width: \"20px\", height: \"20px\"});</script>";
+            text = text + "<script> $(\".javaLogo\").css ({width: \"20px\", height: \"20px\"});\n $(\".SOLogo\").css ({width: \"20px\", height: \"20px\"});$(\".gitLogo\").css ({width: \"20px\", height: \"20px\"});</script>";
             */
 
             var values = map2[i+count]["class"];
-            if(values.length >0)
-            {
-                //titleString = titleString + "<h3>Classes: </h3>"
-            }
-            
-           
+
             for(var j=0; j<values.length; j++)
             {
                 titleString = titleString + "<h3 align = 'left'>" + values[j] + "</h3>"
                 titleString = titleString + "<table>";
-                titleString = titleString + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlClass(values[j]) + "\"><u>Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
-                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsClass(values[j]) + "\"><u>Stack Overflow posts(" + getPostCountClass(values[j]) + ")</u></a> involving " + getShortClass(values[j]) +  " </td></tr>";
+                //titleString = titleString + "<tr><td><img class = \"javaLogo\" src=\"" + javaImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlClass(values[j]) + "\"><u>Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
+                //titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsClass(values[j]) + "\"><u>Stack Overflow posts</u></a> involving " + getShortClass(values[j]) +  " </td></tr>";
+                titleString = titleString + "<tr><td><img class = \"javaLogo\" src=\"" + javaImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlClass(values[j]) + "\"><u>Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
+                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsClass(values[j]) + "\"><u>Stack Overflow posts</u></a> involving " + getShortClass(values[j]) +  " </td></tr>";
                 titleString = titleString + "</table><br>";
             }
 
@@ -205,21 +221,21 @@ function updatePage(response)
             {
                 titleString = titleString + "<h3 align = 'left'>" + values[j] + "</h3>"
                 titleString = titleString + "<table>";
-                titleString = titleString + "<tr><td><img class = \"androidLogo\" src=\"" + androidImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlMethod(values[j]) + "\"><u> Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
-                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsMethod(values[j]) + "\"><u>Stack Overflow posts(" + getPostCountMethod(values[j]) + ")</u></a> involving " + getShortMethod(values[j]) +  " </td></tr>";
+                titleString = titleString + "<tr><td><img class = \"javaLogo\" src=\"" + javaImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getUrlMethod(values[j]) + "\"><u> Javadoc </u></a></td><td>&nbsp;&nbsp;</td><td align = 'left'>[developer.android.com]</td></tr>";
+                titleString = titleString + "<tr><td><img class = \"SOLogo\" src=\"" + soImg + "\"></td><td>&nbsp;&nbsp;</td><td align = 'left'><a href = \"" + getOtherSOPostsMethod(values[j]) + "\"><u>Stack Overflow posts</u></a> involving " + getShortMethod(values[j]) +  " </td></tr>";
                 titleString = titleString + "</table><br>";
             }
-            titleString = titleString + "<script> $(\".androidLogo\").css ({width: \"20px\", height: \"20px\"});\n $(\".SOLogo\").css ({width: \"20px\", height: \"20px\"});$(\".gitLogo\").css ({width: \"20px\", height: \"20px\"});</script>";
+            titleString = titleString + "<script> $(\".javaLogo\").css ({width: \"20px\", height: \"20px\"});\n $(\".SOLogo\").css ({width: \"20px\", height: \"20px\"});$(\".gitLogo\").css ({width: \"20px\", height: \"20px\"});</script>";
         }
         contentMap[lineno] = titleString;
         newCode = newCode + "<span class = \"ttip\" title = \""+ lineno +"\">" + arr[i] + "</span>\n"
     }
 
     $(".answer.accepted-answer").find(".post-text").find("code").first().html(newCode);
-    
+
     var newCSS = GM_getResourceText ("customCSS");
     GM_addStyle(newCSS);
-    
+
 
 
     $(".ttip").on('mouseenter',
@@ -252,16 +268,20 @@ function updatePage(response)
 
 
 var contentMap = {};
+var urlListing = {};
 var baseBaker = "http://gadget.cs.uwaterloo.ca:2145/snippet/getanswers.php";
 var baseBakerCount = "http://gadget.cs.uwaterloo.ca:2145/snippet/getanswerscount.php";
-var androidImg = "http://blog.appliedis.com/wp-content/uploads/2013/11/android1.png";
+var javaImg = "http://www.softcrayons.com/img/javabig.png";
 var ghImg = "http://msysgit.github.io/img/git_logo.png";
 var soImg = "http://files.quickmediasolutions.com/so-images/stackoverflow.svg";
 var androidBaseUrl = "http://developer.android.com/reference/";
 var answerId = getAnswerId();
+var urlToQuery = "http://gadget.cs.uwaterloo.ca:2145/snippet/BakerMapApiInCode.php?aid=" + answerId + "&code=" + code;
+alert(urlToQuery);
+
 var code = getCodeBlockText();
 GM_xmlhttpRequest({
     method: "GET",
-    url: "http://gadget.cs.uwaterloo.ca:2145/snippet/BakerMapApiInCode.php?aid=" + answerId + "&code=" + code,
+    url: urlToQuery,
     onload: updatePage
 });
